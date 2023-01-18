@@ -1,9 +1,12 @@
 const bcrypt = require("bcrypt");
-const gravatar = require('gravatar');
+const gravatar = require("gravatar");
+const { v4: uuidv4 } = require("uuid");
 
 const { User } = require("../../models");
 
-const { RequestError } = require("../../helpers");
+const { RequestError, sendEmail } = require("../../helpers");
+
+const { BASE_URL } = process.env;
 
 const register = async (req, res) => {
   const { email, password } = req.body;
@@ -15,8 +18,22 @@ const register = async (req, res) => {
 
   const hashPassword = await bcrypt.hash(password, 10);
   const avatarURL = gravatar.url(email);
+  const verificationToken = uuidv4();
 
-  const newUser = await User.create({ ...req.body, password: hashPassword, avatarURL: avatarURL });
+  const newUser = await User.create({
+    ...req.body,
+    password: hashPassword,
+    avatarURL: avatarURL,
+    verificationToken,
+  });
+
+  const sendingVerify = {
+    to: email,
+    subject: "Verify you email",
+    html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${verificationToken}">Click here from verify email</a>`,
+  };
+
+  sendEmail(sendingVerify);
 
   res.status(201).json({
     user: {
