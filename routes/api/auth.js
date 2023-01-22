@@ -28,8 +28,17 @@ router.patch(
   validateBody(schemasForAuth.subscriptionSchema),
   ctrlWrapper(controller.updateSubscription)
 );
-
-
-router.patch("/avatars", authenticate, avatarsDir.single("avatar"), ctrlWrapper(controller.changeAvatars))
+router.patch(
+  "/avatars",
+  authenticate,
+  avatarsDir.single("avatar"),
+  ctrlWrapper(controller.changeAvatars)
+);
+router.get("/verify/:verificationToken", ctrlWrapper(controller.verification));
+router.post(
+  "/verify",
+  validateBody(schemasForAuth.verifyResendSchema),
+  ctrlWrapper(controller.resendVerifyMessage)
+);
 
 module.exports = router;

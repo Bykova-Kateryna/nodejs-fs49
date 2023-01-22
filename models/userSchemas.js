@@ -16,10 +16,15 @@ const subscriptionSchema = Joi.object({
   subscription: Joi.string().required(),
 });
 
+const verifyResendSchema = Joi.object({
+  email: Joi.string().pattern(emailRegexp).required(),
+});
+
 const schemasForAuth = {
   registerSchema,
   loginSchema,
   subscriptionSchema,
+  verifyResendSchema,
 };
 
 module.exports = schemasForAuth;
